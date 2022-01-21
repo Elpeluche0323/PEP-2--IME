@@ -1,80 +1,80 @@
-# Nombres:
-# Estefanía Alvarez 20.371.287-1
-# Stephan Silva 20.298.778-8
-# Francisco Moreno 19.892.183-1
-# Maximiliano Araya 20.467.583-k
-# Daniel Jara 20.113.716-0
 
-
-if (!require(ggplot2)){
-  install.packages("ggplot2", dependencies = TRUE )
   require (ggplot2)
-}
-if (!require(ez)){
-  install.packages("ez", dependencies = TRUE )
   require (ez)
-}
-
-if (!require(ggpubr)){
-  install.packages("ggpubr", dependencies = TRUE )
   require (ggpubr)
-}
-
+  require (readxl)
 
 # ////////////////////////// PREGUNTA 1 //////////////////////////
 
-# La avicultura de carne es un negocio muy lucrativo, y cualquier método que ayude al rápido crecimiento de
-# los pollitos es beneficioso, tanto para las avícolas como para los consumidores no veganos. En el paquete
-# datasets de R (importado nativamente) está el conjunto de datos chickwts con los resultados de un
-# experimento hecho (supuestamente en 1948) para medir la efectividad de varios suplementos alimenticios
-# en la tasa de crecimiento de las aves, en donde pollitos recién nacidos se separaron aleatoriamente en
-# seis grupos, y a cada grupo se le dio un suplemento distinto por seis semanas. Se reportan los pesos, en
-# gramos, alcanzados por los pollitos. Para productores de la 7º región, es especialmente importante saber
-# si deberían usar suplementos basados en linaza (linseed), leche (casein), habas (horsebean) o girasol
-# (sunflower).
+#Lord Vader desea saber si los niveles de exigencia con que los distintos oficiales evaluadores
+#(instructor, capit�n, comandante y general) califican a los recontroopers son similares,
+#por lo que le ha solicitado estudiar si existen
+#diferencias significativas en el promedio de la evaluaci�n realizada por cada uno de los oficiales.
+#El Lord Sith ha sido muy
+#claro al solicitar un reporte de aquellos oficiales cuyas evaluaciones presenten diferencias.
 
+
+# Hip�tesis nula:
+# H0: La exigencia de los distintos oficiales evaluadores es la misma
+  
+# Hip�tesis alternativa:
+# Ha: La exigencia de al menos un oficial evaluador es distinta
+  
+
+  # /// An�lisis para ver si se cumplen las condiciones para aplicar ANOVA de una v�a ///
+  # para muestras independientes
+  
+  # 1. La variable dependiente tiene escala de intervalos iguales
+  # 2. Las muestras son independientes y obtenidas aleatoriamente
+  # 3. Se puede asumir que las poblaciones son aproximadamente normales
+  # 4. Las muestras tienen varianzas similares
+  
+  #la variable dependiente posee una escala de intervalos iguales por lo que esto se cumple
+  
+  #Se asume que las evaluaciones realizadas son aleatorias(tomando en cuenta la gran poblacion de clones y recluta en star wars)
+  
+  #para la condicion 3, se comprueba a traves de grafico Qq
+  
+ # g <- ggqqplot(
+#    datos,
+#    x = "eval_instructor",
+#    color = "red"
+#  )
+  
+#  g <- g + facet_wrap(~ eval_instructor)
+#  print(g)
+  
+  
+#se comprueba que son aproximadamente normales
+
+  
+#se comprueban las varianzas  
+  
+  
 # se importan los datos
-datos <- chickwts
+datos <- read.csv2(file.choose(), encoding = "UTF-8", sep = ";")
 
 
-# se agrega columna con las instancias realizadas
-datos[["instancia"]] <- factor(1:nrow(datos))
+#se eligen los datos necesarios
+datos <- datos %>% select(division, eval_instructor, eval_capitan, eval_comandante,eval_general)
+#se filtran los datos para solo los recontrooper
+datos2 <- datos %>% filter(division == "Recontrooper")
 
-#suplemento <- factor(datos[[]])
-#instancia <- factor(seq( 1, 71, by = 1))
-#datos2 <- data.frame (instancia, feed, weight)
-
-alfa <- 0.01
-
-
-# Hipótesis nula:
-# H0: La efectividad promedio de los suplementos es igual para todas las muestras
-
-# Hipótesis alternativa:
-# Ha: La efectividad promedio es diferente para al menos un suplemento
+prueba <- aov (eval_instructor~division,
+               data = datos)
+cat ("Resultado de la prueba ANOVA")
+print (summary (prueba))
 
 
-# /// Análisis para ver si se cumplen las condiciones para aplicar ANOVA de una vía ///
-# para muestras indeopendientes
-
-# 1. La variable dependiente tiene escala de intervalos iguales
-# 2. Las muestras son independientes y obtenidas aleatoriamente
-# 3. Se puede asumir que las poblaciones son aproximadamente normales
-# 4. Las muestras tienen varianzas similares
 
 
-# - Se puede afirmar que efectivamente la variable dependiente posee una escala de 
-# intervalos iguales, por lo que la condici?n 1 si se cumple
-
-# - Para la condición 2 el mismo enunciado se?ala que los pollitos estudiados fueron 
-# seleccionados de manera aleatoria
 
 # - Para la condición 3, esta se puede comprobar mediante un gráfico QQ
 
 g <- ggqqplot(
   datos,
   x = "weight",
-  color = "feed"
+  color = "red"
 )
 
 g <- g + facet_wrap(~ feed)
