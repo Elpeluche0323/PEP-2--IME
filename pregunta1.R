@@ -30,26 +30,9 @@
   # 3. Se puede asumir que las poblaciones son aproximadamente normales
   # 4. Las muestras tienen varianzas similares
   
-  #la variable dependiente posee una escala de intervalos iguales por lo que esto se cumple
+  #1.la variable dependiente posee una escala de intervalos iguales por lo que esto se cumple
   
-  #Se asume que las evaluaciones realizadas son aleatorias(tomando en cuenta la gran poblacion de clones y recluta en star wars)
-  
-  #para la condicion 3, se comprueba a traves de grafico Qq
-  
- # g <- ggqqplot(
-#    datos,
-#    x = "eval_instructor",
-#    color = "red"
-#  )
-  
-#  g <- g + facet_wrap(~ eval_instructor)
-#  print(g)
-  
-  
-#se comprueba que son aproximadamente normales
-
-  
-#se comprueban las varianzas  
+  #2.Se asume que las evaluaciones realizadas son aleatorias(tomando en cuenta la gran poblacion de clones y recluta en star wars)
   
   
 # se importan los datos
@@ -67,6 +50,17 @@ datos3 <- datos2 %>% pivot_longer (c("eval_instructor", "eval_capitan", "eval_co
                                   names_to = "eval",
                                   values_to = "puntaje")
 print(datos3)
+
+#3.para la condicion 3, se comprueba a traves de grafico Qq
+ g <- ggqqplot(
+   datos3,
+    x = "eval",
+    color = "red"
+  )
+#4.la condicion 3 se cumple si bien existen unos pocos puntos pero es poca desviacion
+print(g)
+
+#viendo el grafico anterior tambien se logra ver que se cumple la condicion 4
 
 #se realiza la prueba anova
   prueba2 <- ezANOVA (
@@ -103,5 +97,22 @@ holm<-pairwise.t.test ( datos3[["puntaje"]],
 print(holm)
 
 
+#data:  datos3[["puntaje"]] and datos3[["eval"]] 
+
+#               eval_capitan eval_comandante eval_general
+#eval_comandante 0.80         -               -           
+#  eval_general    <2e-16       <2e-16          -           
+#  eval_instructor 0.58         0.80            <2e-16     
+
+#no se porque solo aparecen 3 y no 4
+
+
+#Conclusion
+
+#Como el valor de p menor a la significancia utilizada,podemos rechazar la hipotesis nula
+#a favor de la hipotesis alternativa,encontrando diferencias entre las evaluaciones promedio
+#para al menos 1 evaluador, por otra parte se revisan los valores obtenidos en el procedimiento post-hoc.
+
+#En lo que respecta a cual evaluador fue el que tuvo grandes diferencias,este fue el evaluador general
 
 
