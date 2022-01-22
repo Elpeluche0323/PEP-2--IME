@@ -2,7 +2,8 @@
   require (ggplot2)
   require (ez)
   require (ggpubr)
-  
+  require (tidyr)
+  require (dplyr)
 
 # ////////////////////////// PREGUNTA 1 //////////////////////////
 
@@ -71,7 +72,7 @@ print(datos3)
   prueba2 <- ezANOVA (
   data = datos3 ,
   dv = puntaje ,
-  between = division ,
+  between = eval ,
   wid = id ,
   return_aov = TRUE )
 
@@ -83,9 +84,9 @@ g2 <- ezPlot (
   data = datos3,
   dv = puntaje,
   wid = id,
-  between = division,
+  between = eval,
   y_lab = "puntaje promedio de los evaluadores",
-  x = division
+  x = eval
 )
 
 print(g2)
@@ -94,7 +95,7 @@ print(g2)
 alfa <- 0.01
 
 holm<-pairwise.t.test ( datos3[["puntaje"]],
-                        datos3[["division"]],
+                        datos3[["eval"]],
                         p.adj = "holm",
                         pool.sd = TRUE,
                         paired = FALSE,
