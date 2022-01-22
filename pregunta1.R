@@ -2,7 +2,7 @@
   require (ggplot2)
   require (ez)
   require (ggpubr)
-  require (readxl)
+  
 
 # ////////////////////////// PREGUNTA 1 //////////////////////////
 
@@ -55,97 +55,52 @@
 datos <- read.csv2(file.choose(), encoding = "UTF-8", sep = ";")
 
 
+
+
 #se eligen los datos necesarios
-datos <- datos %>% select(division, eval_instructor, eval_capitan, eval_comandante,eval_general)
+datos <- datos %>% select(id,division, eval_instructor, eval_capitan, eval_comandante,eval_general)
 #se filtran los datos para solo los recontrooper
 datos2 <- datos %>% filter(division == "Recontrooper")
 
-prueba <- aov (eval_instructor~division,
-               data = datos)
-cat ("Resultado de la prueba ANOVA")
-print (summary (prueba))
+datos3 <- datos2 %>% pivot_longer (c("eval_instructor", "eval_capitan", "eval_comandante","eval_general") ,
+                                  names_to = "eval",
+                                  values_to = "puntaje")
+print(datos3)
+
+#se realiza la prueba anova
+  prueba2 <- ezANOVA (
+  data = datos3 ,
+  dv = puntaje ,
+  between = division ,
+  wid = id ,
+  return_aov = TRUE )
+
+print(prueba2)
 
 
-
-
-
-# - Para la condición 3, esta se puede comprobar mediante un gráfico QQ
-
-g <- ggqqplot(
-  datos,
-  x = "weight",
-  color = "red"
+# Gr�fico del tama�o del efecto
+g2 <- ezPlot (
+  data = datos3,
+  dv = puntaje,
+  wid = id,
+  between = division,
+  y_lab = "puntaje promedio de los evaluadores",
+  x = division
 )
 
-g <- g + facet_wrap(~ feed)
-print(g)
+print(g2)
 
+#prueba post-hoc
+alfa <- 0.01
 
-# - Luego, se puede apreciar que, si bien hay algunos puntos un poco distantes, no hay desviaciones 
-# importantes en los datos, por lo tanto, se cumplir?an todas las condiciones para realizar ANOVA
-
-
-
-# Procedimiento ANOVA con aov
-prueba <- aov (weight~feed,
-               data = datos)
-cat ("Resultado de la prueba ANOVA")
-print (summary (prueba))
-
-
-# Gráfico del tamaño del efecto
-g2 <- ezPlot (
-  data = datos,
-  dv = weight,
-  wid = instancia,
-  between = feed,
-  y_lab = "Peso promedio de los pollitos [g]",
-  x = feed
-  )
-
-print (g2)
-
-#Warning: muestra un warning en consola, esto es debido a que la cantidad de datos por grupo es diferente, 
-#de todos modos no afecta el gráfico.
-
-
-#Gráfico de cajas que compara los pesos de los pollitos por tipo de suplemento
-g3 <- boxplot(weight ~ feed,
-             data = datos,
-             border = "red",
-             col = "pink",
-             ylab = "Pesos de los Pollitos [g]",
-             xlab = "Suplemento")
-
-print (g3)
-
-
-cat ("\n\ nProcedimiento post - hoc de Holm \n\n")
-
-holm<-pairwise.t.test ( datos[["weight"]],
-                            datos[["feed"]],
-                            p.adj = "holm",
-                            pool.sd = TRUE,
-                            paired = FALSE,
-                            conf.level = 1 - alfa )
+holm<-pairwise.t.test ( datos3[["puntaje"]],
+                        datos3[["division"]],
+                        p.adj = "holm",
+                        pool.sd = TRUE,
+                        paired = FALSE,
+                        conf.level = 1 - alfa )
 print(holm)
 
 
-#data:  datos[["weight"]] and datos[["feed"]] 
-
-#            casein  horsebean linseed meatmeal soybean
-#  horsebean 2.9e-08 -         -       -        -      
-#  linseed   0.00016 0.09435   -       -        -      
-#  meatmeal  0.18227 9.0e-05   0.09435 -        -      
-#  soybean   0.00532 0.00298   0.51766 0.51766  -      
-#  sunflower 0.81249 1.2e-08   8.1e-05 0.13218  0.00298
-
-#P value adjustment method: holm 
-
-# Conclusión: Con valores p menores a la significancia utilizada, se puede rechazar la hipótesis nula a favor
-# de la hipótesis alternativa, encontrando diferencia en la efectividad promedio para al menos un suplemento,
-# esto se puede evidenciar al observar el gráfico de cajas, donde las medias son notoriamente diferentes para
-# cada suplemento, por otra parte se revisa en los valores p obtenidos en el procedimiento post - hoc.
-# Se puede concluir entonces con un 90% de confianza que la efectividad promedio es diferente para al menos un suplemento.
 
 
